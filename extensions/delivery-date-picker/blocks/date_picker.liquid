@@ -1,0 +1,53 @@
+
+  <div id="delivery-date-picker">
+    <label for="delivery-date">Select your delivery date:</label>
+    <input type="date" id="delivery-date" name="delivery-date">
+  </div>
+  
+  <script>
+    const today = new Date();
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + 2);
+  
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + 4);
+  
+    const dateInput = document.getElementById('delivery-date');
+    dateInput.min = minDate.toISOString().split('T')[0];
+    dateInput.max = maxDate.toISOString().split('T')[0];
+    document.getElementById('delivery-date').addEventListener('change', function() {
+      const selectedDate = this.value;
+    console.log("selectedDate=>",selectedDate)
+      if (selectedDate) {
+        // Make an AJAX call to Shopify's cart/update.js endpoint to store the delivery date as a cart attribute
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            attributes: {
+              delivery_date: selectedDate
+            }
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Delivery date updated successfully:', data);
+        })
+        .catch((error) => {
+          console.error('Error updating delivery date:', error);
+        });
+      }
+    });
+  </script>
+  
+{% schema %}
+{
+  "name": "Date Picker",
+  "target": "section",
+  "settings": [
+  ]
+}
+{% endschema %}
+
